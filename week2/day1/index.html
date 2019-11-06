@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Github API</title>
+  <style>
+      .error {
+        border: 2px solid red;
+        background-color: black;
+        color: crimson;
+        min-height: 100px;
+        padding: 10px;
+      }
+  
+      .error p {
+        text-align: center;
+        font-size: 30px;
+      }
+  
+      .input {
+        width: 100%;
+        border: 3px solid green;
+      }
+  
+      .search {
+        min-height: 25px;
+      }
+  
+      .user-input {
+        margin: 10px 0px;
+        text-align: center;
+      }
+  
+      button.search {
+        height: 55px;
+        width: 500px;
+        margin: 5px;
+      }
+  
+      .card {
+        border: 1px solid black;
+      }
+  
+    </style>
+  <script
+			  src="https://code.jquery.com/jquery-3.4.1.js"
+			  integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU="
+        crossorigin="anonymous"></script>
+        
+  <script>
+    $(document).ready(function() {
+      console.log(document.getElementById('error-section'));
+      $('#search-button').click(function() {
+        var input = $('#user-name').first();
+        var name = input.val().trim();
+
+        input.val('');
+        $('.user-content').first().hide();
+
+        if (name) {
+          return search(name);
+        }
+
+        // errors have occured
+        displayError('You must provide a username!!!');
+      });
+
+    });
+
+    function search(name) {
+      $('#error-section').hide();
+      console.log(`https://api.github.com/users/${name}`);
+      $.get({
+        url: `https://api.github.com/users/${name}`,
+        success: createCard,
+        error: function(error) {
+          displayError(`Something went wrong, ensure the user you are requesting exists: ${name}`);
+        }
+      })
+    }
+
+    function displayError(message) {
+      $('#error-section')
+          .empty()
+          .show()
+          .append(`<p>${message}</p>`);
+    }
+
+    function createCard(user) {
+      console.log('user object', user);
+
+      var element = `
+        <div id='card' class='card'>
+          <img class='img avatar' src='${user.avatar_url}' alt='avatar'>
+          <p>login: ${user.login}</p>
+          <p>name: ${user.name || 'N/A' }</p>
+          <p>repos: ${user.public_repos}</p>
+          <p>gists: ${user.public_gists}</p>
+        </div>
+      `
+
+      console.log(element);
+      $('.user-content').first().empty().show().append(element);
+    }
+    console.log('hello from the browser');
+
+  </script>        
+</head>
+<body>
+
+<main>
+  <section id="error-section" class="error" hidden='true'></section>
+
+  <section class="user-input">
+    <input type="text" id="user-name" class="search input" placeholder='github username'>
+    <button id="search-button" class="search">Search</button>
+  </section>
+
+  <section class="user-content">
+
+  </section>
+</main>
+</body>
+</html>
